@@ -1,0 +1,69 @@
+# Import required libraries
+import pandas as pd
+import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn import metrics
+
+# Load the dataset
+df = pd.read_csv('emails.csv')
+print(df)
+print(df.shape)
+
+# Check for null values
+print(df.isnull().any())
+
+# Drop unnecessary column
+df.drop(columns='Email No.', inplace=True)
+print(df)
+
+# Replace numerical prediction with string labels
+df['Prediction'] = df['Prediction'].replace({0: 'Not spam', 1: 'Spam'})
+print(df['Prediction'].unique())
+
+# Split the data into features (X) and target (Y)
+X = df.drop(columns='Prediction', axis=1)
+Y = df['Prediction']
+
+print(X.columns)
+print(Y.head())
+
+# Split dataset into training and testing sets
+x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+
+# Convert to numpy arrays for compatibility
+x_train = np.ascontiguousarray(np.array(x_train, dtype=np.float64))
+x_test = np.ascontiguousarray(np.array(x_test, dtype=np.float64))
+
+# -----------------------------------------------
+# KNN Model
+# -----------------------------------------------
+knn = KNeighborsClassifier(n_neighbors=7)
+knn.fit(x_train, y_train)
+y_pred_knn = knn.predict(x_test)
+
+print("\nKNN Prediction:\n", y_pred_knn)
+
+# Accuracy of KNN model
+accuracy_knn = metrics.accuracy_score(y_test, y_pred_knn)
+print("\nKNN Accuracy:", accuracy_knn)
+
+# Confusion Matrix for KNN
+conf_matrix_knn = metrics.confusion_matrix(y_test, y_pred_knn)
+print("Confusion Matrix (KNN):\n", conf_matrix_knn)
+
+# -----------------------------------------------
+# SVM Model
+# -----------------------------------------------
+model = SVC(C=1)
+model.fit(x_train, y_train)
+y_pred_svm = model.predict(x_test)
+
+# Accuracy of SVM model
+accuracy_svm = metrics.accuracy_score(y_test, y_pred_svm)
+print("\nSVM Accuracy:", accuracy_svm)
+
+# Confusion Matrix for SVM
+conf_matrix_svm = metrics.confusion_matrix(y_test, y_pred_svm)
+print("Confusion Matrix (SVM):\n", conf_matrix_svm)
