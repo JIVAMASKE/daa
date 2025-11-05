@@ -1,0 +1,60 @@
+import heapq  # for priority queue (min-heap)
+
+# Node structure for Huffman Tree
+class HuffmanNode:
+    def __init__(self, char, freq):
+        self.char = char
+        self.freq = freq
+        self.left = None
+        self.right = None
+
+    # Define comparator for priority queue
+    def __lt__(self, other):
+        return self.freq < other.freq
+
+
+# Function to print Huffman Codes (recursive)
+def printCode(root, code):
+    if root is None:
+        return
+
+    # If leaf node → print character and code
+    if root.left is None and root.right is None and root.char.isalpha():
+        print(f"{root.char} : {code}")
+        return
+
+    printCode(root.left, code + "0")
+    printCode(root.right, code + "1")
+
+
+# --- Main Program ---
+if __name__ == "__main__":
+    n = 6
+    charArray = ['a', 'b', 'c', 'd', 'e', 'f']
+    charfreq = [5, 9, 12, 13, 16, 45]
+
+    # Create priority queue (min-heap)
+    heap = []
+
+    for i in range(n):
+        node = HuffmanNode(charArray[i], charfreq[i])
+        heapq.heappush(heap, node)
+
+    # Build Huffman Tree
+    while len(heap) > 1:
+        # Pop two smallest frequency nodes
+        x = heapq.heappop(heap)
+        y = heapq.heappop(heap)
+
+        # Create new internal node
+        f = HuffmanNode('-', x.freq + y.freq)
+        f.left = x
+        f.right = y
+
+        heapq.heappush(heap, f)
+
+    # Root node is the only remaining node
+    root = heapq.heappop(heap)
+
+    print("Character and their corresponding Huffman Codes:")
+    printCode(root, "")
